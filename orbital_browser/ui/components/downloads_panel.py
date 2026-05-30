@@ -20,7 +20,7 @@ from PyQt6.QtWidgets import (
     QWidget,
     QStyle,
 )
-from PyQt6.QtWebEngineCore import QWebEngineDownloadRequest
+from utils.download_manager import DownloadEntry
 
 
 def format_size(bytes_count: int) -> str:
@@ -34,10 +34,19 @@ def format_size(bytes_count: int) -> str:
         return f"{bytes_count / (1024 * 1024):.1f} MB"
 
 
+_ACTION_BTN_QSS = (
+    "QPushButton { background: transparent; border: none; border-radius: 6px; }"
+    "QPushButton:hover { background-color: rgba(255, 255, 255, 0.10); }"
+)
+
+
 class DownloadItemWidget(QWidget):
     """Fila individual de descarga con icono, nombre, progreso y metadatos."""
 
-    def __init__(self, item: QWebEngineDownloadRequest) -> None:
+    open_clicked = pyqtSignal(object)         # emite el DownloadEntry
+    open_folder_clicked = pyqtSignal(object)  # emite el DownloadEntry
+
+    def __init__(self, item: DownloadEntry) -> None:
         super().__init__()
         self.item = item
         self.setObjectName("DownloadItem")
@@ -82,11 +91,41 @@ class DownloadItemWidget(QWidget):
 
         layout.addLayout(text_layout, 1)
 
+        # Acciones (sólo visibles cuando la descarga se ha completado).
+        from utils.icon_loader import get_lucide_icon
+        self.actions_widget = QWidget()
+        actions_layout = QHBoxLayout(self.actions_widget)
+        actions_layout.setContentsMargins(0, 0, 0, 0)
+        actions_layout.setSpacing(2)
+
+        self.open_btn = QPushButton()
+        self.open_btn.setIcon(get_lucide_icon("external-link", color="#9696a0", size=14))
+        self.open_btn.setFixedSize(24, 24)
+        self.open_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.open_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.open_btn.setToolTip("Abrir")
+        self.open_btn.setStyleSheet(_ACTION_BTN_QSS)
+        self.open_btn.clicked.connect(lambda: self.open_clicked.emit(self.item))
+
+        self.folder_btn = QPushButton()
+        self.folder_btn.setIcon(get_lucide_icon("folder-open", color="#9696a0", size=14))
+        self.folder_btn.setFixedSize(24, 24)
+        self.folder_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.folder_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.folder_btn.setToolTip("Abrir en carpeta")
+        self.folder_btn.setStyleSheet(_ACTION_BTN_QSS)
+        self.folder_btn.clicked.connect(lambda: self.open_folder_clicked.emit(self.item))
+
+        actions_layout.addWidget(self.open_btn)
+        actions_layout.addWidget(self.folder_btn)
+        self.actions_widget.hide()
+        layout.addWidget(self.actions_widget, 0, Qt.AlignmentFlag.AlignVCenter)
+
     def update_state(self) -> None:
         """Actualiza las etiquetas y la barra de progreso basándose en el estado."""
         total = self.item.totalBytes()
         received = self.item.receivedBytes()
-        
+
         # Calcular porcentaje
         if total > 0:
             percent = int(received * 100 / total)
@@ -97,18 +136,21 @@ class DownloadItemWidget(QWidget):
 
         if self.item.isFinished():
             self.progress.hide()
-            ok = self.item.state() == QWebEngineDownloadRequest.DownloadState.DownloadCompleted
+            ok = self.item.succeeded()
             if ok:
                 self.meta_label.setText(f"{size_str} · Completada")
                 self.meta_label.setStyleSheet("font-size: 11px; color: #4ec9b0;")
                 self.setToolTip("Doble clic para abrir/ejecutar el archivo")
                 self.setCursor(Qt.CursorShape.PointingHandCursor)
+                self.actions_widget.show()  # mostrar Abrir / Abrir en carpeta
             else:
                 self.meta_label.setText(f"{size_str} · Fallida")
                 self.meta_label.setStyleSheet("font-size: 11px; color: #f44747;")
                 self.setToolTip("Descarga fallida")
                 self.setCursor(Qt.CursorShape.ArrowCursor)
+                self.actions_widget.hide()
         else:
+            self.actions_widget.hide()
             self.progress.show()
             if percent >= 0:
                 self.progress.setValue(percent)
@@ -132,6 +174,9 @@ class DownloadsPanel(QFrame):
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self.manager = download_manager
+        # Referencia a la ventana del navegador (este panel es un Popup top-level,
+        # así que self.window() devolvería el propio panel, no el navegador).
+        self._browser = parent
         self.setObjectName("DownloadsPanel")
         self.setFixedWidth(320)
         self._build()
@@ -241,6 +286,8 @@ class DownloadsPanel(QFrame):
             self.list_widget.addItem(list_item)
             
             widget = DownloadItemWidget(item)
+            widget.open_clicked.connect(self._open_item)
+            widget.open_folder_clicked.connect(self._open_folder)
             list_item.setSizeHint(QSize(0, 60))
             self.list_widget.setItemWidget(list_item, widget)
 
@@ -261,22 +308,45 @@ class DownloadsPanel(QFrame):
     def _on_item_double_clicked(self, list_item: QListWidgetItem) -> None:
         widget = self.list_widget.itemWidget(list_item)
         if isinstance(widget, DownloadItemWidget):
-            item = widget.item
-            # Solo intentar abrir si el estado es completado y finalizado
-            if item.isFinished() and item.state() == QWebEngineDownloadRequest.DownloadState.DownloadCompleted:
-                import os
-                path = os.path.join(item.downloadDirectory(), item.downloadFileName())
-                if os.path.exists(path):
-                    # Si el archivo es un PDF, lo abrimos en una nueva pestaña del navegador
-                    if path.lower().endswith(".pdf"):
-                        window = self.window()
-                        if window and hasattr(window, "add_new_tab"):
-                            window.add_new_tab(QUrl.fromLocalFile(path))
-                            self.hide()  # Ocultar el panel emergente de descargas al abrir la pestaña
-                            return
-                    
-                    # Para otros tipos de archivos, abrirlos/ejecutarlos en el sistema operativo
-                    try:
-                        os.startfile(path)
-                    except Exception as e:
-                        print(f"Error al abrir el archivo descargado: {e}")
+            self._open_item(widget.item)
+
+    def _item_path(self, item: DownloadEntry) -> str:
+        import os
+        return os.path.normpath(os.path.join(item.downloadDirectory(), item.downloadFileName()))
+
+    def _open_item(self, item: DownloadEntry) -> None:
+        """Abre/ejecuta el archivo descargado (los PDF en una pestaña nueva)."""
+        import os
+        if not (item.isFinished() and item.succeeded()):
+            return
+        path = self._item_path(item)
+        if not os.path.exists(path):
+            return
+        # Los PDF se abren dentro del navegador en una pestaña nueva.
+        if path.lower().endswith(".pdf") and self._browser is not None and hasattr(self._browser, "add_new_tab"):
+            self._browser.add_new_tab(QUrl.fromLocalFile(path))
+            self.hide()
+            return
+        # El resto se delega al sistema operativo.
+        try:
+            os.startfile(path)
+            self.hide()
+        except Exception as e:
+            print(f"Error al abrir el archivo descargado: {e}")
+
+    def _open_folder(self, item: DownloadEntry) -> None:
+        """Abre el explorador con el archivo descargado seleccionado."""
+        import os
+        import subprocess
+        path = self._item_path(item)
+        try:
+            if os.path.exists(path):
+                # `explorer /select,"ruta"` resalta el archivo dentro de su carpeta.
+                subprocess.Popen(f'explorer /select,"{path}"')
+            else:
+                # Si el archivo ya no está, al menos abrir la carpeta de descargas.
+                folder = item.downloadDirectory()
+                if os.path.isdir(folder):
+                    os.startfile(folder)
+        except Exception as e:
+            print(f"Error al abrir la carpeta de descargas: {e}")

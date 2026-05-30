@@ -4,7 +4,10 @@
    ============================================================ */
 
 QMainWindow {
-    background-color: transparent;
+    /* Opaco: la ventana sin marco es no-layered para que DWM (Windows 11)
+       redondee las esquinas de forma nativa. Mismo color que el contenedor
+       para que no se vea ningún borde fuera del radio que DWM recorta. */
+    background-color: #0f0f11;
 }
 QWidget#CentralContainer {
     background-color: #0f0f11;
@@ -71,7 +74,8 @@ QListWidget#TabList {
 }
 QListWidget#TabList::item {
     padding: 0px;
-    border-radius: 7px;
+    border: 1px solid transparent; /* Reserva el hueco del borde para que no salte al seleccionar */
+    border-radius: 8px;            /* Cápsulas redondeadas, igual que las pestañas superiores */
     margin: 1px 6px;
 }
 QListWidget#TabList::item:hover {
@@ -79,28 +83,26 @@ QListWidget#TabList::item:hover {
 }
 QListWidget#TabList::item:selected {
     background-color: #212127;
-    border-left: 2px solid #ff6b00;
+    border: 1px solid #2d2d37; /* Borde sutil idéntico al de TopTabBar::tab:selected */
 }
 
 /* Contenido de cada pestaña (icono + título + cerrar) */
 QWidget#TabItem { background: transparent; }
 QLabel#TabTitle {
-    color: #c8c8d0;
+    color: #9696a0; /* El color blanco en hover/selección lo gestiona TabItemWidget */
     font-family: 'Segoe UI', system-ui;
+    font-weight: 500;
     font-size: 12px;
     background: transparent;
 }
 QPushButton#TabClose {
     background-color: transparent;
-    color: #6c6c78;
     border: none;
-    border-radius: 5px;
-    font-size: 11px;
+    border-radius: 8px; /* Círculo, igual que TopTabCloseButton */
     padding: 0px;
 }
 QPushButton#TabClose:hover {
-    background-color: #c42b1c;
-    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.12); /* Hover gris translúcido, igual que arriba */
 }
 
 QPushButton#SidebarButton {
@@ -436,3 +438,81 @@ QPushButton#DownloadsPanelFullLink {
 QPushButton#DownloadsPanelFullLink:hover {
     background-color: #26262f;
 }
+
+/* ============================================================
+   Mosaico de pestañas (MosaicGrid / MosaicTile)
+   ============================================================ */
+QWidget#MosaicGrid {
+    background-color: #0f0f11;
+}
+QFrame#MosaicTile {
+    background-color: #16161a;
+    border: 1px solid #2d2d37;
+    border-radius: 8px;
+}
+/* Baldosa activa: borde de acento (propiedad dinámica `active`). */
+QFrame#MosaicTile[active="true"] {
+    border: 1px solid #ff6b00;
+}
+QFrame#MosaicTileHeader {
+    background-color: #1b1b1f;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom: 1px solid #23232a;
+}
+QFrame#MosaicTile[active="true"] QFrame#MosaicTileHeader {
+    background-color: #241a12;
+}
+QLabel#MosaicTileTitle {
+    color: #c8c8d0;
+    font-family: 'Segoe UI', system-ui;
+    font-weight: 600;
+    font-size: 11px;
+    background: transparent;
+}
+QPushButton#MosaicTileClose {
+    background-color: transparent;
+    border: none;
+    border-radius: 8px;
+}
+QPushButton#MosaicTileClose:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Botón de navegación en estado activado (p. ej. mosaico activo). */
+QPushButton#NavButton:checked {
+    background-color: #ff6b00;
+    color: #ffffff;
+}
+
+/* Elementos extra del diálogo de configuración. */
+QFrame#SettingsSeparator {
+    color: #23232a;
+    background-color: #23232a;
+    max-height: 1px;
+    border: none;
+}
+QLabel#SettingsSubtitle {
+    color: #e3e3e9;
+    font-family: 'Segoe UI', system-ui;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Botones de navegación en los mosaicos */
+QPushButton#MosaicTileNav {
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+}
+QPushButton#MosaicTileNav:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+QPushButton#MosaicTileNav:pressed {
+    background-color: #ff6b00;
+}
+QPushButton#MosaicTileNav:disabled {
+    background-color: transparent;
+}
+
+

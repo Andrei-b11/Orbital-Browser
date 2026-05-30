@@ -44,6 +44,35 @@ class _ElidedLabel(QLabel):
         self.setText(metrics.elidedText(self._full, Qt.TextElideMode.ElideRight, self.width()))
 
 
+class _TabCloseButton(QPushButton):
+    """Botón de cierre con icono que pasa a blanco al pasar el ratón.
+
+    Replica el comportamiento de `TopTabCloseButton` de la barra superior para
+    que las pestañas del panel lateral se vean idénticas.
+    """
+
+    def __init__(self, parent=None) -> None:
+        super().__init__(parent)
+        self.setObjectName("TabClose")
+        self.setFixedSize(18, 18)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.setToolTip("Cerrar pestaña")
+        self._update_icon(False)
+
+    def _update_icon(self, hovered: bool) -> None:
+        from utils.icon_loader import get_lucide_icon
+        color = "#ffffff" if hovered else "#9696a0"
+        self.setIcon(get_lucide_icon("x", color=color, size=10))
+
+    def enterEvent(self, event) -> None:
+        self._update_icon(True)
+        super().enterEvent(event)
+
+    def leaveEvent(self, event) -> None:
+        self._update_icon(False)
+        super().leaveEvent(event)
+
+
 class TabItemWidget(QWidget):
     """Contenido visual de una pestaña: icono, título y botón de cierre."""
 
@@ -54,6 +83,8 @@ class TabItemWidget(QWidget):
         self.view = view
         self.setObjectName("TabItem")
         self.setFixedHeight(TAB_HEIGHT)
+        self._hovered = False
+        self._selected = False
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(8, 0, 4, 0)
@@ -66,18 +97,33 @@ class TabItemWidget(QWidget):
         self.title_label = _ElidedLabel(title)
         self.title_label.setObjectName("TabTitle")
 
-        self.close_btn = QPushButton()
-        from utils.icon_loader import get_lucide_icon
-        self.close_btn.setIcon(get_lucide_icon("x", color="#6c6c78", size=10))
-        self.close_btn.setObjectName("TabClose")
-        self.close_btn.setFixedSize(18, 18)
-        self.close_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.close_btn.setToolTip("Cerrar pestaña")
+        self.close_btn = _TabCloseButton()
         self.close_btn.clicked.connect(lambda: self.close_clicked.emit(self.view))
 
         layout.addWidget(self.icon_label)
         layout.addWidget(self.title_label, 1)
         layout.addWidget(self.close_btn)
+        self._refresh_title_color()
+
+    def enterEvent(self, event) -> None:
+        self._hovered = True
+        self._refresh_title_color()
+        super().enterEvent(event)
+
+    def leaveEvent(self, event) -> None:
+        self._hovered = False
+        self._refresh_title_color()
+        super().leaveEvent(event)
+
+    def set_selected(self, selected: bool) -> None:
+        self._selected = selected
+        self._refresh_title_color()
+
+    def _refresh_title_color(self) -> None:
+        # Texto blanco al pasar el ratón o cuando la pestaña está activa, igual
+        # que el comportamiento de TopTabBar; gris en reposo.
+        color = "#ffffff" if (self._hovered or self._selected) else "#9696a0"
+        self.title_label.setStyleSheet(f"color:{color}; background:transparent;")
 
     def set_title(self, title: str) -> None:
         self.title_label.setFullText(title or "Sin título")
@@ -102,6 +148,15 @@ class TabListWidget(QListWidget):
                 return
         super().mousePressEvent(event)
 
+    def startDrag(self, supportedActions) -> None:
+        item = self.currentItem()
+        if item is not None:
+            view = item.data(Qt.ItemDataRole.UserRole)
+            main_win = self.window()
+            if main_win:
+                main_win._dragged_view = view
+        super().startDrag(supportedActions)
+
 
 class Sidebar(QFrame):
     """Barra lateral con la lista de pestañas y controles básicos."""
@@ -109,6 +164,7 @@ class Sidebar(QFrame):
     new_tab_requested = pyqtSignal()
     close_tab_requested = pyqtSignal(int)  # índice de fila
     tab_selected = pyqtSignal(int)         # índice de fila
+    context_menu_requested = pyqtSignal(int, object)  # índice, global_pos
     history_requested = pyqtSignal()
     downloads_requested = pyqtSignal()
     settings_requested = pyqtSignal()
@@ -150,6 +206,11 @@ class Sidebar(QFrame):
         self.tab_list.setSpacing(1)
         self.tab_list.currentRowChanged.connect(self._on_row_changed)
         self.tab_list.middle_clicked.connect(self.close_tab_requested.emit)
+        
+        # Habilitar menú contextual personalizado
+        self.tab_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.tab_list.customContextMenuRequested.connect(self._on_custom_context_menu)
+        
         layout.addWidget(self.tab_list)
 
         # --- Zona inferior: accesos a Historial / Descargas / Configuración ---
@@ -173,8 +234,29 @@ class Sidebar(QFrame):
         layout.addLayout(footer)
 
     def _on_row_changed(self, row: int) -> None:
+        self._apply_selection(row)
         if row >= 0:
             self.tab_selected.emit(row)
+
+    def _on_custom_context_menu(self, pos) -> None:
+        item = self.tab_list.itemAt(pos)
+        if item is not None:
+            row = self.tab_list.row(item)
+            global_pos = self.tab_list.mapToGlobal(pos)
+            self.context_menu_requested.emit(row, global_pos)
+
+    def _apply_selection(self, row: int) -> None:
+        """Marca como activa la fila `row` para pintar su título en blanco.
+
+        El fondo y el borde los gestiona el QSS (::item:selected), pero el color
+        del título vive en un QLabel hijo, así que hay que sincronizarlo aquí.
+        Se llama también desde `set_current_row`, porque la ventana principal
+        cambia de fila con las señales bloqueadas y `_on_row_changed` no dispara.
+        """
+        for r in range(self.tab_list.count()):
+            widget = self._widget_at(r)
+            if widget is not None:
+                widget.set_selected(r == row)
 
     # --- API usada por la ventana principal -----------------------------
     # Cada item guarda su WebViewPane en UserRole y muestra un TabItemWidget.
@@ -233,6 +315,7 @@ class Sidebar(QFrame):
 
     def set_current_row(self, row: int) -> None:
         self.tab_list.setCurrentRow(row)
+        self._apply_selection(row)
 
     def count(self) -> int:
         return self.tab_list.count()

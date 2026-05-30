@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Callable
 
 from PyQt6.QtCore import QTimer, QUrl, pyqtSignal
-from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineProfile
+from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineProfile, QWebEngineSettings
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
 
@@ -54,6 +54,12 @@ class WebViewPane(QWebEngineView):
         self.new_tab_factory = new_tab_factory
         self.setPage(OrbitalPage(profile, self))
 
+        # Habilitar soporte de pantalla completa en Chromium
+        self.settings().setAttribute(
+            QWebEngineSettings.WebAttribute.FullScreenSupportEnabled, True
+        )
+        self.page().fullScreenRequested.connect(self._on_full_screen_requested)
+
     def createWindow(self, _type: QWebEnginePage.WebWindowType) -> QWebEngineView:
         """Chromium solicita una nueva ventana -> abrimos una pestaña nueva."""
         if self.new_tab_factory is not None:
@@ -63,3 +69,10 @@ class WebViewPane(QWebEngineView):
     def set_internal_html(self, html: str, base: QUrl) -> None:
         """Renderiza HTML interno (orbital://…) sin disparar la intercepción."""
         self.page().render_internal(html, base)
+
+    def _on_full_screen_requested(self, request) -> None:
+        main_win = self.window()
+        if main_win and hasattr(main_win, "handle_html5_fullscreen"):
+            main_win.handle_html5_fullscreen(self, request)
+        else:
+            request.reject()

@@ -1,0 +1,9 @@
+2026/05/30-19:30:15.327 a58 Reusing MANIFEST C:\Users\borde\Desktop\orbital\orbital_browser\data\profiles\Andrei\profile\IndexedDB\https_www.youtube.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/05/30-19:30:15.328 a58 Recovering log #20
+2026/05/30-19:30:15.330 a58 Reusing old log C:\Users\borde\Desktop\orbital\orbital_browser\data\profiles\Andrei\profile\IndexedDB\https_www.youtube.com_0.indexeddb.leveldb/000020.log 
+2026/05/30-19:30:16.515 a58 Compacting 1@1 + 1@2 files
+2026/05/30-19:30:16.521 a58 Generated table #23@1: 396 keys, 79632 bytes
+2026/05/30-19:30:16.521 a58 Compacted 1@1 + 1@2 files => 79632 bytes
+2026/05/30-19:30:16.521 a58 compacted to: files[ 0 0 1 0 0 0 0 ]
+2026/05/30-19:30:16.522 a58 Delete type=2 #18
+2026/05/30-19:30:16.522 a58 Delete type=2 #21

@@ -11,8 +11,10 @@ from PyQt6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
     QFormLayout,
+    QFrame,
     QLabel,
     QLineEdit,
+    QSpinBox,
     QVBoxLayout,
     QComboBox,
 )
@@ -119,6 +121,46 @@ class SettingsDialog(QDialog):
 
         root.addLayout(form)
 
+        # --- Sección: Mosaico de pestañas ---
+        sep = QFrame()
+        sep.setFrameShape(QFrame.Shape.HLine)
+        sep.setObjectName("SettingsSeparator")
+        root.addWidget(sep)
+
+        mosaic_title = QLabel("Mosaico de pestañas")
+        mosaic_title.setObjectName("SettingsSubtitle")
+        root.addWidget(mosaic_title)
+
+        mosaic_form = QFormLayout()
+        mosaic_form.setSpacing(12)
+        mosaic_form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
+
+        self.mosaic_max_spin = QSpinBox()
+        self.mosaic_max_spin.setRange(2, 6)
+        self.mosaic_max_spin.setValue(int(self.settings.get("mosaic_max_tiles", 4)))
+        self.mosaic_max_spin.setSuffix(" pestañas")
+        mosaic_form.addRow("Límite de mosaicos:", self.mosaic_max_spin)
+
+        self.mosaic_layout_combo = QComboBox()
+        self.mosaic_layout_combo.addItems(["Rejilla", "Columnas", "Filas"])
+        self._mosaic_layout_values = ["grid", "columns", "rows"]
+        current_layout = self.settings.get("mosaic_layout", "grid")
+        if current_layout in self._mosaic_layout_values:
+            self.mosaic_layout_combo.setCurrentIndex(self._mosaic_layout_values.index(current_layout))
+        mosaic_form.addRow("Disposición:", self.mosaic_layout_combo)
+
+        self.mosaic_gap_spin = QSpinBox()
+        self.mosaic_gap_spin.setRange(0, 24)
+        self.mosaic_gap_spin.setValue(int(self.settings.get("mosaic_gap", 6)))
+        self.mosaic_gap_spin.setSuffix(" px")
+        mosaic_form.addRow("Separación:", self.mosaic_gap_spin)
+
+        root.addLayout(mosaic_form)
+
+        mosaic_hint = QLabel("Activa el mosaico con el botón de la barra o Ctrl+M.")
+        mosaic_hint.setObjectName("SettingsNote")
+        root.addWidget(mosaic_hint)
+
         self.note = QLabel("Algunos cambios se aplican al reiniciar el navegador.")
         self.note.setObjectName("SettingsNote")
         root.addWidget(self.note)
@@ -163,6 +205,11 @@ class SettingsDialog(QDialog):
         
         self.settings["tab_position"] = "left" if self.tab_pos_combo.currentIndex() == 0 else "top"
         self.settings["downloads_view"] = "panel" if self.dl_view_combo.currentIndex() == 0 else "tab"
-        
-        save_settings(self.settings)
+
+        self.settings["mosaic_max_tiles"] = self.mosaic_max_spin.value()
+        self.settings["mosaic_layout"] = self._mosaic_layout_values[self.mosaic_layout_combo.currentIndex()]
+        self.settings["mosaic_gap"] = self.mosaic_gap_spin.value()
+
+        profile_name = getattr(self.parent(), "profile_name", "Default")
+        save_settings(self.settings, profile_name)
         self.accept()

@@ -191,7 +191,7 @@ def downloads_page(items: list) -> str:
         meta = "Completada" if it.isFinished() else "En curso…"
         rows.append((name, name, meta))
     body = (f"<header><h1><span class='accent'>⬇</span> Descargas</h1>"
-            f"<div class='sub'>{len(rows)} descargas en esta sesión</div></header>"
+            f"<div class='sub'>{len(rows)} descargas</div></header>"
             f"{_list(rows)}")
     return _doc("Descargas", "downloads", body)
 

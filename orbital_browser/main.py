@@ -13,9 +13,40 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from PyQt6.QtWidgets import QApplication  # noqa: E402
+from PyQt6.QtNetwork import QLocalServer, QLocalSocket  # noqa: E402
 
 from core.config import load_settings, load_stylesheet  # noqa: E402
 from ui.main_window import MainBrowserWindow  # noqa: E402
+
+# Nombre del servidor local que identifica la instancia única de la app.
+_SINGLETON_NAME = "OrbitalBrowserSingleInstance"
+
+
+def _claim_single_instance() -> QLocalServer | None:
+    """Garantiza una sola instancia (un solo proceso usando el perfil).
+
+    Si ya hay otra instancia viva, le pide que se muestre y devuelve None (esta
+    debe salir). Si no, reclama el "candado" y devuelve el servidor. Dos procesos
+    sobre el mismo perfil bloquean el almacenamiento de Chromium y hacen que se
+    pierdan cookies e inicios de sesión, así que esto es imprescindible.
+    """
+    probe = QLocalSocket()
+    probe.connectToServer(_SINGLETON_NAME)
+    if probe.waitForConnected(300):
+        # Hay una instancia viva: pedirle que traiga su ventana al frente.
+        probe.write(b"raise")
+        probe.flush()
+        probe.waitForBytesWritten(300)
+        probe.disconnectFromServer()
+        return None
+
+    # Sin instancia previa (o murió): limpiar restos y reclamar el candado.
+    # En Windows el named pipe se libera al morir el proceso, así que un cierre
+    # real no deja el candado bloqueado.
+    QLocalServer.removeServer(_SINGLETON_NAME)
+    server = QLocalServer()
+    server.listen(_SINGLETON_NAME)
+    return server
 
 
 def main() -> int:
@@ -38,6 +69,12 @@ def main() -> int:
     app = QApplication(sys.argv)
     app.setApplicationName(settings.get("app_name", "Orbital"))
 
+    # Instancia única: si ya hay otra corriendo, traerla al frente y salir, para
+    # no abrir dos procesos peleando por el almacenamiento del mismo perfil.
+    instance_server = _claim_single_instance()
+    if instance_server is None:
+        return 0
+
     from PyQt6.QtGui import QIcon
     icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "orbital_icon.png")
     if os.path.exists(icon_path):
@@ -47,9 +84,23 @@ def main() -> int:
     if stylesheet:
         app.setStyleSheet(stylesheet)
 
+    # Cuando otra instancia intente arrancar, traer al frente la ventana actual.
+    def _on_second_instance() -> None:
+        conn = instance_server.nextPendingConnection()
+        if conn is not None:
+            conn.readyRead.connect(conn.deleteLater)
+        for win in list(MainBrowserWindow.windows):
+            win.showNormal()
+            win.raise_()
+            win.activateWindow()
+
+    instance_server.newConnection.connect(_on_second_instance)
+
     window = MainBrowserWindow()
     window.show()
-    return app.exec()
+    rc = app.exec()
+    instance_server.close()
+    return rc
 
 
 if __name__ == "__main__":
