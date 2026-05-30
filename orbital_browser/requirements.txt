@@ -1,0 +1,7 @@
+# Orbital · dependencias
+PyQt6>=6.6
+PyQt6-WebEngine>=6.6
+
+# Opcional (Fase 2): pipeline avanzado de favicons con escala de grises + máscara alpha.
+# El re-coloreado básico ya funciona sólo con Qt; Pillow no es obligatorio aún.
+# Pillow>=10.0

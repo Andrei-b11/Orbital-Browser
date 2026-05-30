@@ -1,0 +1,43 @@
+{
+  "app_name": "Orbital",
+  "version": "0.1.0",
+  "window": {
+    "width": 1280,
+    "height": 800
+  },
+  "home_url": "google.com",
+  "new_tab_url": "orbital://start",
+  "search_endpoint": "https://www.google.com/search?q=",
+  "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Orbital/0.1",
+  "accept_language": "es-ES,es;q=0.9,en;q=0.8",
+  "private_mode": true,
+  "restore_session": false,
+  "tab_position": "top",
+  "downloads_view": "tab",
+  "cache_max_size_mb": 150,
+  "frameless": true,
+  "tint_favicons": false,
+  "favicon_tint_color": "#c8c8d0",
+  "chromium_flags": [
+    "--enable-parallel-downloading",
+    "--enable-gpu-rasterization",
+    "--enable-oop-rasterization",
+    "--ignore-gpu-blocklist",
+    "--enable-zero-copy",
+    "--enable-fast-unload",
+    "--num-raster-threads=4",
+    "--enable-dns-prefetching"
+  ],
+  "blocklist": [
+    "doubleclick.net",
+    "google-analytics.com",
+    "googletagmanager.com",
+    "googlesyndication.com",
+    "adservice.google.com",
+    "scorecardresearch.com",
+    "adnxs.com",
+    "facebook.net",
+    "/telemetry",
+    "/analytics"
+  ]
+}

@@ -1,0 +1,438 @@
+/* ============================================================
+   Orbital · Tema oscuro mate minimalista (estilo Zen)
+   Acento: #ff6b00
+   ============================================================ */
+
+QMainWindow {
+    background-color: transparent;
+}
+QWidget#CentralContainer {
+    background-color: #0f0f11;
+    border: 1px solid #23232a;
+    border-radius: 12px;
+}
+QStatusBar {
+    background-color: #0f0f11;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+/* --- Barra superior de navegación --- */
+QFrame#TopBar {
+    background-color: #16161a;
+    border-bottom: 1px solid #23232a;
+}
+
+/* --- Omnibox (barra de direcciones/búsqueda) --- */
+QLineEdit#Omnibox {
+    background-color: #212127;
+    color: #e3e3e9;
+    border: 1px solid #2d2d37;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-family: 'Segoe UI', system-ui;
+    font-size: 13px;
+    selection-background-color: #ff6b00;
+}
+QLineEdit#Omnibox:focus {
+    border: 1px solid #ff6b00;
+    background-color: #16161a;
+}
+
+/* --- Botones de navegación --- */
+QPushButton#NavButton {
+    background-color: transparent;
+    color: #9696a0;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+}
+QPushButton#NavButton:hover {
+    background-color: #212127;
+    color: #ffffff;
+}
+QPushButton#NavButton:pressed {
+    background-color: #ff6b00;
+    color: #ffffff;
+}
+
+/* --- Sidebar de pestañas verticales --- */
+QFrame#Sidebar {
+    background-color: #131316;
+    border-right: 1px solid #23232a;
+}
+QListWidget#TabList {
+    background-color: transparent;
+    border: none;
+    color: #c8c8d0;
+    font-family: 'Segoe UI', system-ui;
+    font-size: 13px;
+    outline: none;
+}
+QListWidget#TabList::item {
+    padding: 0px;
+    border-radius: 7px;
+    margin: 1px 6px;
+}
+QListWidget#TabList::item:hover {
+    background-color: #1d1d22;
+}
+QListWidget#TabList::item:selected {
+    background-color: #212127;
+    border-left: 2px solid #ff6b00;
+}
+
+/* Contenido de cada pestaña (icono + título + cerrar) */
+QWidget#TabItem { background: transparent; }
+QLabel#TabTitle {
+    color: #c8c8d0;
+    font-family: 'Segoe UI', system-ui;
+    font-size: 12px;
+    background: transparent;
+}
+QPushButton#TabClose {
+    background-color: transparent;
+    color: #6c6c78;
+    border: none;
+    border-radius: 5px;
+    font-size: 11px;
+    padding: 0px;
+}
+QPushButton#TabClose:hover {
+    background-color: #c42b1c;
+    color: #ffffff;
+}
+
+QPushButton#SidebarButton {
+    background-color: transparent;
+    color: #9696a0;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    padding: 4px;
+}
+QPushButton#SidebarButton:hover {
+    background-color: #212127;
+    color: #ffffff;
+}
+
+/* ============================================================
+   Barra de título estilo Windows 11 (caption bar)
+   ============================================================ */
+QFrame#CaptionBar {
+    background-color: #1b1b1f;
+    border-bottom: 1px solid #23232a;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+/* Icono de la app en la barra de título: limpio y sin fondos */
+QLabel#CaptionIcon {
+    background-color: transparent;
+    border: none;
+}
+
+/* Título de la ventana */
+QLabel#CaptionTitle {
+    color: #d6d6dd;
+    font-family: 'Segoe UI', system-ui;
+    font-size: 12px;
+}
+
+/* Botón hamburguesa para ocultar/mostrar la barra lateral */
+QPushButton#CaptionMenu {
+    background-color: transparent;
+    color: #c8c8d0;
+    border: none;
+    font-size: 14px;
+}
+QPushButton#CaptionMenu:hover {
+    background-color: #2a2a31;
+    color: #ffffff;
+}
+
+/* Botones de control de ventana (minimizar/maximizar/cerrar)
+   Glifos de 'Segoe Fluent Icons'; métricas nativas de Windows (46x32). */
+QPushButton#CaptionMin, QPushButton#CaptionMax, QPushButton#CaptionClose {
+    background-color: transparent;
+    color: #c8c8d0;
+    border: none;
+    font-family: 'Segoe Fluent Icons', 'Segoe MDL2 Assets';
+    font-size: 10px;
+}
+QPushButton#CaptionMin:hover, QPushButton#CaptionMax:hover {
+    background-color: #2a2a31;
+    color: #ffffff;
+}
+QPushButton#CaptionMin:pressed, QPushButton#CaptionMax:pressed {
+    background-color: #232329;
+}
+QPushButton#CaptionClose:hover {
+    background-color: #c42b1c;
+    color: #ffffff;
+}
+QPushButton#CaptionClose:pressed {
+    background-color: #b0271a;
+    color: #ffffff;
+}
+
+/* --- Barra "buscar en la página" (Ctrl+F) --- */
+QFrame#FindBar {
+    background-color: #1b1b1f;
+    border-top: 1px solid #23232a;
+}
+QLineEdit#FindInput {
+    background-color: #212127;
+    color: #e3e3e9;
+    border: 1px solid #2d2d37;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-family: 'Segoe UI', system-ui;
+    font-size: 13px;
+    selection-background-color: #ff6b00;
+}
+QLineEdit#FindInput:focus {
+    border: 1px solid #ff6b00;
+}
+
+/* --- Barra de progreso de carga --- */
+QProgressBar#LoadProgress {
+    background-color: transparent;
+    border: none;
+}
+QProgressBar#LoadProgress::chunk {
+    background-color: #ff6b00;
+}
+
+/* --- Barra de estado --- */
+QStatusBar {
+    background-color: #16161a;
+    color: #6c6c78;
+    font-size: 11px;
+}
+
+/* ============================================================
+   Diálogo de configuración
+   ============================================================ */
+QDialog#SettingsDialog {
+    background-color: #16161a;
+}
+QLabel#SettingsTitle {
+    color: #ffffff;
+    font-family: 'Segoe UI', system-ui;
+    font-size: 18px;
+    font-weight: 600;
+}
+QLabel#SettingsNote {
+    color: #6c6c78;
+    font-size: 11px;
+}
+QDialog#SettingsDialog QLabel {
+    color: #c8c8d0;
+    font-family: 'Segoe UI', system-ui;
+    font-size: 13px;
+}
+QDialog#SettingsDialog QLineEdit {
+    background-color: #212127;
+    color: #e3e3e9;
+    border: 1px solid #2d2d37;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 13px;
+    selection-background-color: #ff6b00;
+}
+QDialog#SettingsDialog QLineEdit:focus {
+    border: 1px solid #ff6b00;
+}
+QDialog#SettingsDialog QCheckBox {
+    color: #c8c8d0;
+    font-size: 13px;
+    spacing: 8px;
+}
+QDialog#SettingsDialog QCheckBox::indicator {
+    width: 16px; height: 16px;
+    border-radius: 4px;
+    border: 1px solid #2d2d37;
+    background: #212127;
+}
+QDialog#SettingsDialog QCheckBox::indicator:checked {
+    background: #ff6b00;
+    border: 1px solid #ff6b00;
+}
+QDialog#SettingsDialog QPushButton {
+    background-color: #212127;
+    color: #e3e3e9;
+    border: 1px solid #2d2d37;
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-size: 13px;
+}
+QDialog#SettingsDialog QPushButton:hover {
+    background-color: #2a2a31;
+    border: 1px solid #ff6b00;
+}
+
+/* ============================================================
+   Barra de pestañas horizontal superior (modo Chrome)
+   ============================================================ */
+QWidget#TopTabContainer {
+    background-color: #131316;
+    border-bottom: 1px solid #23232a;
+}
+QTabBar#TopTabBar {
+    background-color: transparent;
+    border: none;
+}
+QTabBar#TopTabBar::tab {
+    background-color: transparent;
+    color: #9696a0;
+    padding: 8px 12px 8px 16px; /* Padding natural para centrado perfecto */
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-right: 4px;
+    border-radius: 8px; /* Cápsulas redondeadas estilo Zen */
+    font-family: 'Segoe UI', system-ui;
+    font-weight: 500;
+    font-size: 12px;
+    min-width: 160px; /* Ancho fijo e idéntico para todas las pestañas */
+    max-width: 160px;
+}
+QTabBar#TopTabBar::tab:hover {
+    background-color: #1d1d22;
+    color: #ffffff;
+}
+QTabBar#TopTabBar::tab:selected {
+    background-color: #212127;
+    color: #ffffff;
+    border: 1px solid #2d2d37;
+}
+QPushButton#TopTabCloseButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 8px; /* Círculo perfecto de 16x16 */
+}
+QPushButton#TopTabCloseButton:hover {
+    background-color: rgba(255, 255, 255, 0.12); /* Hover gris translúcido premium */
+}
+QPushButton#TopTabAddButton {
+    background-color: transparent;
+    color: #9696a0;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    margin-top: 4px;
+}
+QPushButton#TopTabAddButton:hover {
+    background-color: #212127;
+    color: #ffffff;
+}
+
+/* Overrides para cuando las pestañas horizontales están integradas en la barra de título superior (CaptionBar) */
+#CaptionBar QTabBar#TopTabBar::tab {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    padding: 4px 10px 4px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    min-width: 140px;
+    max-width: 140px;
+}
+#CaptionBar QPushButton#TopTabAddButton {
+    margin-top: 0px;
+}
+
+/* ============================================================
+   Menú de navegación desplegable (NavMenu)
+   ============================================================ */
+QMenu#NavMenu {
+    background-color: #16161a;
+    border: 1px solid #23232a;
+    border-radius: 6px;
+    padding: 4px;
+    color: #e3e3e9;
+    font-family: 'Segoe UI', system-ui;
+    font-size: 13px;
+}
+QMenu#NavMenu::item {
+    padding: 6px 24px 6px 12px;
+    border-radius: 4px;
+    background-color: transparent;
+}
+QMenu#NavMenu::item:selected {
+    background-color: #ff6b00;
+    color: #ffffff;
+}
+QMenu#NavMenu::separator {
+    height: 1px;
+    background-color: #23232a;
+    margin: 4px 6px;
+}
+
+/* ============================================================
+   Panel flotante de descargas (DownloadsPanel)
+   ============================================================ */
+QFrame#DownloadsPanel {
+    background-color: #16161a;
+    border: 1px solid #2d2d37;
+    border-radius: 12px;
+}
+QFrame#DownloadsPanelHeader {
+    background-color: transparent;
+    border-bottom: 1px solid #2d2d37;
+}
+QPushButton#DownloadsPanelClose {
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+}
+QPushButton#DownloadsPanelClose:hover {
+    background-color: #2c2c35;
+}
+QListWidget#DownloadsPanelList {
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+QWidget#DownloadItem {
+    background-color: transparent;
+    border-bottom: 1px solid #212127;
+}
+QWidget#DownloadItem:hover {
+    background-color: #1d1d23;
+}
+QProgressBar#DownloadItemProgress {
+    background-color: #212127;
+    border: none;
+    border-radius: 2px;
+}
+QProgressBar#DownloadItemProgress::chunk {
+    background-color: #ff6b00;
+    border-radius: 2px;
+}
+QListWidget#DownloadsPanelList::item {
+    background-color: transparent;
+    border: none;
+    padding: 0px;
+}
+QListWidget#DownloadsPanelList::item:hover {
+    background-color: transparent;
+}
+QListWidget#DownloadsPanelList::item:selected {
+    background-color: transparent;
+}
+QFrame#DownloadsPanelFooter {
+    background-color: transparent;
+    border-top: 1px solid #2d2d37;
+}
+QPushButton#DownloadsPanelFullLink {
+    background-color: transparent;
+    color: #ff6b00;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+}
+QPushButton#DownloadsPanelFullLink:hover {
+    background-color: #26262f;
+}

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m compileall -q nexus_browser)",
+      "Bash(QT_QPA_PLATFORM=offscreen python -c ' *)",
+      "Bash(findstr \"RESULT Error Traceback\")",
+      "PowerShell($env:QT_QPA_PLATFORM=\"offscreen\"; cd \"C:\\\\Users\\\\borde\\\\Desktop\\\\MIA\\\\nexus_browser\"; $out = python _smoke_test.py 2>&1; $out | Where-Object { $_ -match \"RESULT|Error|Traceback|AttributeError\" })"
+    ]
+  }
+}

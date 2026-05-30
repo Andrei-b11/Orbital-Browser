@@ -1,0 +1,27 @@
+2026/05/30-12:41:48.690 39b8 Reusing MANIFEST C:\Users\borde\Desktop\MIA\nexus_browser\data\profile\IndexedDB\https_www.speedtest.net_0.indexeddb.leveldb/MANIFEST-000001
+2026/05/30-12:41:48.691 39b8 Recovering log #12
+2026/05/30-12:41:48.691 39b8 Reusing old log C:\Users\borde\Desktop\MIA\nexus_browser\data\profile\IndexedDB\https_www.speedtest.net_0.indexeddb.leveldb/000012.log 
+2026/05/30-12:41:48.691 39b8 Delete type=2 #11
+2026/05/30-12:41:48.708 44c0 Level-0 table #17: started
+2026/05/30-12:41:48.714 44c0 Level-0 table #17: 774 bytes OK
+2026/05/30-12:41:48.715 44c0 Delete type=0 #12
+2026/05/30-12:41:48.716 4fc8 Manual compaction at level-0 from '\x00\x0c\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0d\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0d\x00\x00\x05' @ 1435 : 1
+2026/05/30-12:41:48.716 4fc8 Compacting 1@0 + 1@1 files
+2026/05/30-12:41:48.718 4fc8 Generated table #18@0: 390 keys, 6423 bytes
+2026/05/30-12:41:48.718 4fc8 Compacted 1@0 + 1@1 files => 6423 bytes
+2026/05/30-12:41:48.719 4fc8 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/05/30-12:41:48.719 4fc8 Delete type=2 #17
+2026/05/30-12:41:48.719 2f88 Manual compaction at level-0 from '\x00\x0d\x00\x00\x05' @ 1435 : 1 .. '\x00\x0d\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/05/30-12:41:48.720 2f88 Level-0 table #20: started
+2026/05/30-12:41:48.725 2f88 Level-0 table #20: 1828 bytes OK
+2026/05/30-12:41:48.726 2f88 Delete type=2 #14
+2026/05/30-12:41:48.726 2f88 Delete type=0 #16
+2026/05/30-12:41:48.727 2f88 Manual compaction at level-0 from '\x00\x0d\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0e\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0e\x00\x00\x05' @ 1461 : 1
+2026/05/30-12:41:48.727 2f88 Compacting 1@0 + 1@1 files
+2026/05/30-12:41:48.729 2f88 Generated table #21@0: 391 keys, 7751 bytes
+2026/05/30-12:41:48.729 2f88 Compacted 1@0 + 1@1 files => 7751 bytes
+2026/05/30-12:41:48.729 2f88 compacted to: files[ 0 1 1 0 0 0 0 ]
+2026/05/30-12:41:48.730 2f88 Delete type=2 #20
+2026/05/30-12:41:48.730 2f88 Manual compaction at level-0 from '\x00\x0e\x00\x00\x05' @ 1461 : 1 .. '\x00\x0e\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/05/30-12:41:48.805 4fc8 Manual compaction at level-0 from '\x00\x0e\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0f\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/05/30-12:41:48.820 4fc8 Manual compaction at level-0 from '\x00\x0f\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x10\x00\x00\x00' @ 0 : 0; will stop at (end)
